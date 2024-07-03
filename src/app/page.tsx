@@ -25,15 +25,26 @@ import {
   WalletIcon,
 } from "lucide-react";
 
+import { useRouter } from 'next/router';
+
+// Inside your component:
+
 
 // wallet button
 
 async function connectWallet() {
   if (window.solana) {
     try {
+      const router = useRouter(); 
       const response = await window.solana.connect();
       console.log("Connected wallet address:",
       response.publicKey.toString());
+
+      // Redirect to subscriber page after successful connection
+      router.push('/subscribe');
+
+      
+
     } catch (error) {
       console.error("Connection failed:", error);
     }
