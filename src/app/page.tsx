@@ -25,33 +25,15 @@ import {
   WalletIcon,
 } from "lucide-react";
 
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 // Inside your component:
 
+// const router = useRouter(); 
 
 // wallet button
 
-async function connectWallet() {
-  if (window.solana) {
-    try {
-      const router = useRouter(); 
-      const response = await window.solana.connect();
-      console.log("Connected wallet address:",
-      response.publicKey.toString());
 
-      // Redirect to subscriber page after successful connection
-      router.push('/subscribe');
-
-      
-
-    } catch (error) {
-      console.error("Connection failed:", error);
-    }
-  } else {
-    alert("Please install a Solana wallet like Phantom!");
-  }
-}
 
 
 const actionCards: Array<{
@@ -94,7 +76,29 @@ const actionCards: Array<{
   // },
 ];
 
-export default async function Pages() {
+export default function Pages() {
+  const router = useRouter();
+  async function connectWallet() {
+    if (window.solana) {
+      try {
+        const response = await window.solana.connect();
+  
+  
+        console.log("Connected wallet address:",
+        response.publicKey.toString());
+  
+        // Redirect to subscriber page after successful connection
+        router.push('/prototype');
+  
+        
+  
+      } catch (error) {
+        console.error("Connection failed:", error);
+      }
+    } else {
+      alert("Please install a Solana wallet like Phantom!");
+    }
+  }
   return (
     <>
       { <section className="space-y-6 pb-8 pt-6 md:pb-12 md:pt-10 lg:pt-32">
@@ -140,8 +144,8 @@ export default async function Pages() {
             Prototype.
           </h2>
           <p className="max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7">
-            We are implementing Solana Blinks so that you can interact directly through the blockchain.
-            This is what you can do on our platform.
+            We are implementing Solana Blinks so that you can interact directly with the blockchain, from anywhere on the web.
+            Since you are here, this is what you can do on our platform:
           </p>
         </div>
 
