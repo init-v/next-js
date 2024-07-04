@@ -13,13 +13,14 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { getProgram } from '../../../utils/anchor-client';
 
 
+
 export function Subscribe() {
   const wallet = useWallet();
   const [subscriptionPubkey, setSubscriptionPubkey] = useState(null);
   async function handleSubscribe() {
     if (!wallet.connected) return;
     
-    const connection = new anchor.web3.Connection(/* your RPC URL */);
+    const connection = new anchor.web3.Connection('https://api.devnet.solana.com');
     const program = getProgram(connection, wallet);
 
     const subscription = anchor.web3.Keypair.generate();
@@ -60,7 +61,8 @@ return (
     {subscriptionPubkey && <p>Subscribed! ID: {subscriptionPubkey.toString()}</p>}
   </div>
 );
-}
+};
+
 
 
 
@@ -68,6 +70,8 @@ return (
 
 
 export default function Pages() {
+  const wallet = useWallet();
+  const [subscriptionPubkey, setSubscriptionPubkey] = useState(null);
   const apiPath = "/api/actions/memo";
   const [apiEndpoint, setApiEndpoint] = useState("");
 
@@ -78,6 +82,45 @@ export default function Pages() {
       setApiEndpoint(new URL(apiPath, window.location.href).toString());
     };
   }, []);
+
+  async function handleSubscribe() {
+    console.log("wallet connection statys:", wallet.connected);
+    if (!wallet.connected) {
+      alert('Please connect your wallet first.');
+      return;
+    }
+    
+    const connection = new anchor.web3.Connection('https://api.devnet.solana.com');
+    const program = getProgram(connection, wallet);
+
+    const subscription = anchor.web3.Keypair.generate();
+
+    try {
+      await program.methods.initialize()
+        .accounts({
+          subscription: subscription.publicKey,
+          subscriber: wallet.publicKey,
+          systemProgram: anchor.web3.SystemProgram.programId,
+        })
+        .signers([subscription])
+        .rpc();
+
+      setSubscriptionPubkey(subscription.publicKey);
+      await program.methods.pay()
+      .accounts({
+        subscription: subscription.publicKey,
+        subscriber: wallet.publicKey,
+        creator: new anchor.web3.PublicKey('Dng8T7j5bkQVnShovS3UeP98W7bKirro5CesqyzemT9P'),
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .rpc();
+
+      console.log("Subscribed and paid!");
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }
+
 
   return (
     <section
@@ -99,7 +142,9 @@ export default function Pages() {
       </div>
 
       <Card className="group-hover:border-primary max-w-[80vw] md:max-w-[400px] aspect-square rounded overflow-clip text-center flex items-center justify-center mx-auto">
-        {/* <SolanaQRCode
+        <p>photo</p>
+        {/* Uncomment and adjust if needed
+        <SolanaQRCode
           url={apiPath}
           color="white"
           background="black"
@@ -109,21 +154,10 @@ export default function Pages() {
       </Card>
 
       <div className="mx-auto text-center md:max-w-[58rem]">
-        
-          <section>
-            <h3>
-              v.init is writing code
-              </h3>
-              </section>
-          <Link
-              href={siteConfig.links.investor_int}
-              target="_blank"
-              rel="noreferrer"
-              className={cn(buttonVariants({ variant: "outline", size: "lg" }))}
-            >
-              Subscribe for 1 SOL
-            </Link>
-
+        <button onClick={handleSubscribe} className={cn(buttonVariants({ size: "lg" }))}>
+          Subscribe for 1 SOL
+        </button>
+        {subscriptionPubkey && <p>Subscribed! ID: {subscriptionPubkey.toString()}</p>}
       </div>
 
       <Card className="group-hover:border-primary">
@@ -145,6 +179,8 @@ export default function Pages() {
     </section>
   );
 }
+
+
 
 
 // // pages/prototype.tsx

@@ -27,11 +27,14 @@ import {
 
 import { useRouter } from 'next/navigation';
 
-// Inside your component:
+// IMPLEMENTATION OF WALLET STATE: 
 
-// const router = useRouter(); 
+ import WalletConnectionManager from '../components/WalletConnectionManager';
 
-// wallet button
+
+
+
+
 
 
 
@@ -100,6 +103,9 @@ export default function Pages() {
     }
   }
   return (
+
+
+    
     <>
       { <section className="space-y-6 pb-8 pt-6 md:pb-12 md:pt-10 lg:pt-32">
         <div className="container flex max-w-[64rem] flex-col items-center gap-4 text-center">
